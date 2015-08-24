@@ -1,29 +1,42 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 
+import javax.swing.DefaultListModel;
+import javax.swing.ListModel;
 
-public class IndividualUser implements Users,Observer,Subject {
+public class IndividualUser extends Users implements Observer,Subject {
 	private String id;
-	private List<Observer> followers;
-	private List<Subject> followings;
-	private List<String> newsfeed;
+	private ArrayList<Observer> followers=new ArrayList<Observer>();;
+	private ArrayList<Subject> followings=new ArrayList<Subject>();
+	private ArrayList<String> newsfeed=new ArrayList<String>();
+	private DefaultListModel<String> newsFeedListModel;
 	private String message;
 	private boolean changeState=false;
 	
+	public IndividualUser(String id,DefaultListModel<String>list){
+		setID(id);
+		this.allowsChildren=false;
+		this.newsFeedListModel=list;
+	}
+	@Override
 	public void setID(String id){
 		this.id=id;
 	}
-	public String getID(String message){
+	@Override
+	public String getID(){
 		return this.id;
 	}
-	public void setMessage(String message){
-		this.message=message;
+	public DefaultListModel<String> getListModel(){
+		return this.newsFeedListModel;
 	}
-	public String getMessage(){
-		return this.message;
+	@Override
+	public String toString(){
+		return this.getID();
 	}
 	public void follow(IndividualUser user){
-		followings.add(user);
+		setSubject(user);
+		user.register(this);
 	}
 	public void tweet(String message){
 		this.message=message;
@@ -31,6 +44,16 @@ public class IndividualUser implements Users,Observer,Subject {
 		this.changeState=true;
 		notifyObservers();
 	}
+	public ArrayList<String> getMessages(){//used to see if observer pattern works.
+			return  this.newsfeed;
+	}
+	public ArrayList<Observer> getFollowers(){
+		return this.followers;
+	}
+	public ArrayList<Subject> getFollowings(){
+		return this.followings;
+	}
+	
 	/**
 	 * subject methods
 	 */
@@ -54,12 +77,10 @@ public class IndividualUser implements Users,Observer,Subject {
 		}
 		else 
 			return;
-		//if  changed iterates through observer arraylist off followers and calls update.
-		
 	}
 	@Override
-	public Object getUpdate(Observer o) {
-		return this.getMessage();
+	public String getUpdate(Observer o) {
+		return this.message;
 	}
 	
 	
@@ -69,7 +90,9 @@ public class IndividualUser implements Users,Observer,Subject {
 	
 	@Override
 	public void update(Subject s) {
-		s.getUpdate(this);
+		String update=s.getUpdate(this);
+		this.newsfeed.add(update);//add the new message returned by subject to this news feed.
+		this.newsFeedListModel.addElement("- "+s.toString()+": "+update);
 		
 	}
 	@Override
@@ -77,5 +100,4 @@ public class IndividualUser implements Users,Observer,Subject {
 		followings.add(s);
 		
 	}
-
 }
