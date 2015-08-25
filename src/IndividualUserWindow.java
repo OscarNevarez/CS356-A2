@@ -11,10 +11,16 @@ import javax.swing.border.BevelBorder;
 
 import java.awt.Color;
 
-
+/**
+ * This class creates a JFrame or individual user view
+ * @author Oscar Nevarez
+ * @version 1.0
+ */
 @SuppressWarnings("serial")
 public class IndividualUserWindow extends JFrame {
-
+	/*
+	 * user object and treeModel object passed in via constructor.
+	 */
 	private IndividualUser user;
 	private DefaultTreeModel treeModel;
 	/*
@@ -25,7 +31,7 @@ public class IndividualUserWindow extends JFrame {
 	/*
 	 * JLists
 	 */
-	private JList<String> followingsList;
+	private JList<Subject> followingsList;
 	private JList<String> newsFeedList;
 	/*
 	 * buttons 
@@ -34,9 +40,9 @@ public class IndividualUserWindow extends JFrame {
 	private JButton btnTweet;
 	private JButton btnNewButton;
 	/*
-	 * list models one for followings, the other is a field in the IndividualUserClass.
+	 * list models one for followings, the other is a field in the IndividualUser Class.
 	 */
-	private DefaultListModel<String> modelFollowings;
+	private DefaultListModel<Subject> modelFollowings;
 	private DefaultListModel<String> modelNewsFeed;
 	private JPanel border1;
 	private JPanel border2;
@@ -46,8 +52,9 @@ public class IndividualUserWindow extends JFrame {
 	public IndividualUserWindow(IndividualUser individualUser,DefaultTreeModel tree) {
 		this.user=individualUser;
 		this.treeModel=(DefaultTreeModel) tree;
-		this.modelNewsFeed= user.getListModel();
-
+		this.modelNewsFeed= user.getNewsFeedListModel();
+		this.modelFollowings=user.getFollowingsListModel();
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle(user.getID()+"'s "+"User View");
 		setBounds(100, 100, 477, 435);
@@ -55,30 +62,28 @@ public class IndividualUserWindow extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-
-		modelFollowings = new DefaultListModel<String>();
-
+		
+		//border and JList
 		border1 = new JPanel();
 		border1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Following:", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		border1.setBounds(0, 56, 469, 119);
 		contentPane.add(border1);
 		border1.setLayout(null);
-		followingsList=new JList<String>(modelFollowings);
+		followingsList=new JList<Subject>(modelFollowings);
 		JScrollPane scrollPane = new JScrollPane(followingsList);
 		scrollPane.setBounds(10, 16, 449, 92);
 		border1.add(scrollPane);
 
-
+		//border and JList
 		border2 = new JPanel();
 		border2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "News Feed", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		border2.setBounds(0, 235, 465, 170);
 		contentPane.add(border2);
 		border2.setLayout(null);
-		newsFeedList=new JList<String>(user.getListModel());
+		newsFeedList=new JList<String>(user.getNewsFeedListModel());
 		JScrollPane scrollPane_1 = new JScrollPane(newsFeedList);
 		scrollPane_1.setBounds(10, 21, 445, 139);
 		border2.add(scrollPane_1);
-
 
 
 		/*
@@ -112,7 +117,7 @@ public class IndividualUserWindow extends JFrame {
 		textUserId = new JTextArea();
 		textUserId.setBounds(6, 16, 274, 36);
 		border4.add(textUserId);
-
+		
 		//event handler
 		TheHandler handler=new TheHandler();
 
@@ -132,10 +137,22 @@ public class IndividualUserWindow extends JFrame {
 
 		setVisible(true);
 	}
+	
+	/**
+	 * This method creates a pop up box with a message
+	 * @param infoMessage the message that appears in the pop up box
+	 * @param titleBar the title bar for the window
+	 */
 	private void infoBox(String infoMessage, String titleBar)
 	{
 		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
 	}
+	
+	/**
+	 * This method takes in a Users node and checks for possible issues following said node
+	 * @param node the user this object is trying to follow
+	 * @return true if there is an error with the following of the parameter node.
+	 */
 	private boolean errorFollowingUser(Users node){
 		if(alreadyFollowingUser(node)){
 			infoBox("You are already following this user!", "ERROR!");
@@ -147,19 +164,40 @@ public class IndividualUserWindow extends JFrame {
 		}
 		return false;
 	}
+	
+	/**
+	 * This method checks to see if the parameter node is already being followed by this user
+	 * @param node the User this node is trying to follow
+	 * @return true if this user is already following the parameter node.
+	 */
 	private boolean alreadyFollowingUser(Users node){
-		return user.getFollowings().contains(node);
+		Object[] array= user.getFollowings();
+		for(Object user:array){
+			if(user.equals(node))
+				return true;
+		}
+		 return false;
 	}
+	
+	/**
+	 * This method check to see if the the parameter node is this user and returns true of if this 
+	 * node and the parameter node are equal.
+	 * @param node the User node that this user is trying to follow
+	 * @return true if this user is the same as the parameter node
+	 */
 	private boolean followingOwn(Users node){
 		return node.getID().equals(user.getID());
 	}
+	
+	/*
+	 * This class serves as an event handler for buttons.
+	 */
 	private class TheHandler implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			//source of action is follow button
 			if(e.getSource()==btnFollow){
-
-
 				String userId=textUserId.getText().trim();
 				Users node=null;
 				LookForMatchingNode iterateTree=new LookForMatchingNode(userId);
@@ -172,15 +210,14 @@ public class IndividualUserWindow extends JFrame {
 					return;
 				if(node instanceof IndividualUser){
 					user.follow((IndividualUser) node);
-					modelFollowings.addElement(userId);
 					infoBox("User was found!","Found User");
 					return;
 				}
 			}
+			//source of action is tweet button
 			if(e.getSource()==btnTweet){
 				String msg=textTweetMessage.getText().trim();
 				user.tweet(msg);
-				modelNewsFeed.addElement("- "+"Me: "+msg);
 			}
 		}
 

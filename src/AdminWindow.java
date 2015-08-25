@@ -15,7 +15,11 @@ import javax.swing.border.MatteBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
-
+/**
+ * This class creates a JFrame or admin panel
+ * @author Oscar Nevarez
+ * @version 1.0
+ */
 @SuppressWarnings("serial")
 public class AdminWindow extends JFrame{
 	private static AdminWindow instance;
@@ -36,7 +40,7 @@ public class AdminWindow extends JFrame{
 	private JPanel panel2;
 	private JPanel panel3;
 
-	/**
+	/*
 	 * Create the frame.
 	 */
 	private AdminWindow() {
@@ -135,6 +139,11 @@ public class AdminWindow extends JFrame{
 		
 		this.setVisible(true);
 	}
+	
+	/**
+	 *Sets the icons for node types, if node is an instance of IndividualUser it is a leaf
+	 *@see MyCellRenderer
+	 */
 	private void setIcons() {
 		tree.setCellRenderer(new DefaultTreeCellRenderer() {
          private Icon groupIcon = UIManager.getIcon("FileView.directoryIcon");
@@ -160,7 +169,11 @@ public class AdminWindow extends JFrame{
 		return instance;
 	}
 
-	/** Add child to the currently selected node. */
+   /**
+    * this method adds a new node into the tree, invokes the tree model's inserNodeInto internally
+    * to trigger the appropriate event for the JTree
+    * @param child the node that will be added to the tree model
+    */
 	public void addNode(Users child) {
 		if(treeContains(child)){
 			infoBox("Node already exists in tree!","error");
@@ -181,12 +194,22 @@ public class AdminWindow extends JFrame{
 		treeModel.insertNodeInto(child,parentNode,parentNode.getChildCount());
 		tree.scrollPathToVisible(new TreePath(child.getPath()));
 	}
+	
+	/**
+	 * This method checks to see if a the parameter node is already in the tree
+	 * @param child the node that is being searched for in the tree
+	 * @return true if the parameter node is already in the tree.
+	 */
 	private boolean treeContains(Users child) {
 		LookForMatchingNode iterateTree=new LookForMatchingNode(child.getID());
 		VisitableTree tree=new VisitableTree(treeModel);
 		tree.accept(iterateTree);
 		return iterateTree.isInTree();
 	}
+	
+	/**
+	 *This method opens a user view 
+	 */
 	private void openUserView(){
 
 		TreePath parentPath = tree.getSelectionPath(); 
@@ -198,11 +221,18 @@ public class AdminWindow extends JFrame{
 		else 
 			infoBox("Action not supported, no User View for Groups","ERROR!");
 	}
+	
+	/**
+	 * This method creates a pop up box with a message
+	 * @param infoMessage the message that appears in the pop up box
+	 * @param titleBar the title bar for the window
+	 */
 	private void infoBox(String infoMessage, String titleBar)
 	{
 		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
 	}
 	private class Handler implements ActionListener {
+		//action from respective buttons
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource()==btnAddUser){
@@ -222,7 +252,7 @@ public class AdminWindow extends JFrame{
 			}
 			else{
 				VisitableTree tree=new VisitableTree(treeModel);
-
+				
 				if(e.getSource()==btnShowUserTotal){
 					UserTotal userTotal=new UserTotal();
 					tree.accept(userTotal);
@@ -239,8 +269,11 @@ public class AdminWindow extends JFrame{
 					tree.accept(messagesTotal);
 					infoBox("There are "+messagesTotal.result()+" Messages.","Total Messages");
 				}
-				if(e.getSource()==btnOpenUserView){
-
+				if(e.getSource()==btnShowPositivePercentage){
+					PositivePercentage positivePercentage=new PositivePercentage("good happy awesome great excellent agree honest admirable amazing astonishing beatiful caring"
+							+ "brilliant charismatic dandy faithful giving");
+					tree.accept(positivePercentage);
+					infoBox(+positivePercentage.result()+"% of messages are positive","Positive Percentage of messages");
 				}
 			}
 		}

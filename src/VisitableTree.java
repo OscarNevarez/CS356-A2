@@ -1,11 +1,15 @@
 import java.util.Enumeration;
-
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 
-
-
+/**
+ * This class provides data access to a DefaultTreeModel data model
+ * @author Oscar Nevarez
+ * @version 1.0
+ */
 public class VisitableTree  implements Visitable{
+	/*
+	 * the tree structure that this class will provide access to.
+	 */
     private DefaultTreeModel tree;
     
     public VisitableTree(DefaultTreeModel tree){
