@@ -22,19 +22,20 @@ public class UserGroup extends Users{
 	}
 	
 	/**
-	 * This method calls the insert method of the parent class to insert nodes. Note using @see inserNodeInto method that is provided by the 
+	 * This method calls the insert method of the parent class to insert nodes. Note using @see {@link javax.swing.tree.DefaultTreeModel#insertNodeInto(javax.swing.tree.MutableTreeNode, javax.swing.tree.MutableTreeNode, int)} method that is provided by the 
 	 * DefaultTreeModel is the preferred way to add nodes due to the fact that it fires the proper event for JTree.
 	 * @see javax.swing.tree.DefaultTreeModel
 	 * @see javax.swing.tree.DefaultMutableTreeNode
 	 * @param user the user that will be added to this user group children
 	 * @param childIndex the index where the user parameter will be added in this user groups children Vector
 	 */
-	public void addUser(Users user,int childIndex){
+	public void insert(Users user,int childIndex){
 		super.insert(user, childIndex);
 	}
 	
 	/**
 	 * This method calls the remove method of the parent class to remove nodes from this node.
+	 * Note not used in this assignment.
 	 * @param user the child that will be removed from this node.
 	 */
 	public void removeUser(Users user){

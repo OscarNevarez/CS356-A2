@@ -13,7 +13,11 @@ public class TreeDataHandler implements Visitable,TreeDataStructure  {
 	private Map<String,Users> map;
 	private DefaultTreeModel tree;
 	private PopUpDialogBox popUp=new PopUpDialogBox();
-
+	
+	/**
+	 * This constructor creates an instance of this class with the specified map in the parameter
+	 * @param map the map that will be used to store node refrences.
+	 */
 	public  TreeDataHandler(Map<String,Users> map){
 		Users root=new UserGroup("Root");
 		this.map=map;

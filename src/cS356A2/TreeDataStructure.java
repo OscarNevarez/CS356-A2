@@ -4,7 +4,8 @@ import javax.swing.tree.DefaultTreeModel;
 /**
  * This interface is used to define the default behaviors that are required
  * for a tree data structure to implement for use with this application.
- * @author Oscar
+ * @author Oscar Nevarez
+ * @version 1.0
  *
  */
 public interface TreeDataStructure {

@@ -2,7 +2,7 @@ package cS356A2;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * This abstract class determines default behaviors for classes the extend this one.
+ * This abstract class determines default behaviors for classes that extend this one.
  * @author Oscar Nevarez
  * @version 1.0
  */
