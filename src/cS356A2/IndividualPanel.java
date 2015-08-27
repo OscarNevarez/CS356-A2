@@ -8,7 +8,7 @@ public interface IndividualPanel {
 	
 	/**
 	 * This method checks to see if the parameter node is already being followed by this user
-	 * @param node the user this user is trying to follow
+	 * @param user node the user this user is trying to follow
 	 * @return true if this user is already following the parameter node.
 	 */
 	public boolean alreadyFollowingUser(Users user);
@@ -16,7 +16,7 @@ public interface IndividualPanel {
 	/**
 	 * This method check to see if the the parameter node is this user and returns true if this 
 	 * node and the parameter node are equal.
-	 * @param node the user node that this user is trying to follow
+	 * @param user the user node that this user is trying to follow
 	 * @return true if this user is the same as the parameter node
 	 */
 	public boolean followingOwn(Users user);

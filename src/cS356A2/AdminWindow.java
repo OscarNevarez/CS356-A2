@@ -214,14 +214,25 @@ public class AdminWindow extends JFrame implements AdminPanel{
 				selectedNode=getSelectedNode(tree);
 				if(userId.isEmpty())
 					return;
-				treeDataHandler.addNode(selectedNode,newUser,tree);
+				if(treeDataHandler.addNode(selectedNode,newUser)){
+					tree.scrollPathToVisible(new TreePath(newUser.getPath()));
+				}
+				else {
+					return;
+				}
+				
 			}
 			if(e.getSource()==btnAddGroup){
 				String groupId=txtrUserGroupId.getText().trim();
 				Users newUserGroup=new UserGroup(groupId);
 				if(groupId.isEmpty())
 					return;
-				treeDataHandler.addNode(selectedNode,newUserGroup,tree);
+				if(treeDataHandler.addNode(selectedNode,newUserGroup)){
+					tree.scrollPathToVisible(new TreePath(newUserGroup.getPath()));
+				}
+				else {
+					return;
+				}
 			}
 			if(e.getSource()==btnOpenUserView){
 				openUserView(selectedNode);

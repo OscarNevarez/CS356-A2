@@ -1,5 +1,4 @@
 package cS356A2;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 
 /**
@@ -12,10 +11,12 @@ public interface TreeDataStructure {
 	
 	/**
 	 * This method adds a new node into the tree, invokes the tree model's inserNodeInto internally
-	 * to trigger the appropriate event for the JTree
+	 * to trigger the appropriate event for the JTree. Requires JTree to make new node visible.
+	 * @param parentNode parent of the node that will be added
 	 * @param child the node that will be added to the tree model
+	 * @return true if the node was added.
 	 */
-	public void addNode(Users parentNode,Users child,JTree drawnTree);
+	public boolean addNode(Users parentNode,Users child);
 	
 	/**
 	 * This method returns true if the tree contains the user specified by the input String

@@ -44,11 +44,10 @@ public class IndividualUser extends Users implements Observer,Subject {
 	private boolean changeState=false;
 	
 	/**
-	 * This constructor creates and instance of this object with the id parameter, and sets 
-	 * this object list model with the list parameter.
+	 * This constructor creates and instance of this object with the id parameter, and instantiates this 
+	 * objects list model.
 	 * @param id the id that will be assigned to this user object
-	 * @param list the list model that will be assigned to this object, Must be of Type DefaultListModel
-	 * @see DefaultListModel
+	 * @see javax.swing.DefaultListModel
 	 */
 	public IndividualUser(String id){
 		setID(id);
