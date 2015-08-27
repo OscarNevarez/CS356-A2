@@ -1,28 +1,17 @@
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
+package cS356A2;
 
-import javax.swing.tree.TreeNode;
-
-
+/**
+ * This class creates and instance of a user group and uses composition to store other Users type objects.
+ * @author Oscar Nevarez
+ * @version 1.0
+ */
+@SuppressWarnings("serial")
 public class UserGroup extends Users{
-	
-	/*
-	 *parent group of this usergroup, if null the this node is the root. 
-	 */
-	private Users parent;
 	
 	/*
 	 *id of this userGroup 
 	 */
 	private String groupID;
-	
-	/*
-	 * used to store IndividualUsers and other UserGroups
-	 */
-	private Vector children; //can also have another userGroup inside.
-	
 	
 	/**
 	 *This method sets the id for this user group 

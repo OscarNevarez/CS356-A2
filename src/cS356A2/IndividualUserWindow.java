@@ -1,14 +1,9 @@
+package cS356A2;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.tree.*;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.Enumeration;
-
 import javax.swing.border.TitledBorder;
-import javax.swing.border.BevelBorder;
-
 import java.awt.Color;
 
 /**
@@ -17,12 +12,13 @@ import java.awt.Color;
  * @version 1.0
  */
 @SuppressWarnings("serial")
-public class IndividualUserWindow extends JFrame {
+public class IndividualUserWindow extends JFrame implements IndividualPanel {
 	/*
 	 * user object and treeModel object passed in via constructor.
 	 */
-	private IndividualUser user;
-	private DefaultTreeModel treeModel;
+	private IndividualUser currentlyViewedUser;
+	private TreeDataHandler treeDataHandler;
+	private PopUpDialogBox popUpBox=new PopUpDialogBox();
 	/*
 	 * text Boxes
 	 */
@@ -38,25 +34,23 @@ public class IndividualUserWindow extends JFrame {
 	 */
 	private JButton btnFollow;
 	private JButton btnTweet;
-	private JButton btnNewButton;
 	/*
 	 * list models one for followings, the other is a field in the IndividualUser Class.
 	 */
 	private DefaultListModel<Subject> modelFollowings;
-	private DefaultListModel<String> modelNewsFeed;
 	private JPanel border1;
 	private JPanel border2;
 	private JPanel border3;
 	private JPanel border4;
 
-	public IndividualUserWindow(IndividualUser individualUser,DefaultTreeModel tree) {
-		this.user=individualUser;
-		this.treeModel=(DefaultTreeModel) tree;
-		this.modelNewsFeed= user.getNewsFeedListModel();
-		this.modelFollowings=user.getFollowingsListModel();
+	public IndividualUserWindow(IndividualUser individualUser,TreeDataHandler treeDataHandler) {
+		this.currentlyViewedUser=individualUser;
+		this.treeDataHandler=treeDataHandler;
+		currentlyViewedUser.getNewsFeedListModel();
+		this.modelFollowings=currentlyViewedUser.getFollowingsListModel();
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle(user.getID()+"'s "+"User View");
+		setTitle(currentlyViewedUser.getID()+"'s "+"User View");
 		setBounds(100, 100, 477, 435);
 		JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -80,7 +74,7 @@ public class IndividualUserWindow extends JFrame {
 		border2.setBounds(0, 235, 465, 170);
 		contentPane.add(border2);
 		border2.setLayout(null);
-		newsFeedList=new JList<String>(user.getNewsFeedListModel());
+		newsFeedList=new JList<String>(currentlyViewedUser.getNewsFeedListModel());
 		JScrollPane scrollPane_1 = new JScrollPane(newsFeedList);
 		scrollPane_1.setBounds(10, 21, 445, 139);
 		border2.add(scrollPane_1);
@@ -138,16 +132,16 @@ public class IndividualUserWindow extends JFrame {
 		setVisible(true);
 	}
 	
-	/**
-	 * This method creates a pop up box with a message
-	 * @param infoMessage the message that appears in the pop up box
-	 * @param titleBar the title bar for the window
-	 */
-	private void infoBox(String infoMessage, String titleBar)
-	{
-		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
-	}
 	
+	@Override
+	public void tweet(String msg){
+		this.currentlyViewedUser.tweet(msg);
+	}
+	@Override
+	public void follow(IndividualUser userToFollow){
+		this.currentlyViewedUser.follow((IndividualUser) userToFollow);
+		popUpBox.infoBox("You are now following "+userToFollow.getID()+"!","Found User");
+	}
 	/**
 	 * This method takes in a Users node and checks for possible issues following said node
 	 * @param node the user this object is trying to follow
@@ -155,23 +149,19 @@ public class IndividualUserWindow extends JFrame {
 	 */
 	private boolean errorFollowingUser(Users node){
 		if(alreadyFollowingUser(node)){
-			infoBox("You are already following this user!", "ERROR!");
+			popUpBox.infoBox("You are already following this user!", "ERROR!");
 			return true;
 		}
 		if(followingOwn(node)){
-			infoBox("You cannot follow yourself!", "ERROR!");
+			popUpBox.infoBox("You cannot follow yourself!", "ERROR!");
 			return true;
 		}
 		return false;
 	}
 	
-	/**
-	 * This method checks to see if the parameter node is already being followed by this user
-	 * @param node the User this node is trying to follow
-	 * @return true if this user is already following the parameter node.
-	 */
-	private boolean alreadyFollowingUser(Users node){
-		Object[] array= user.getFollowings();
+	@Override
+	public boolean alreadyFollowingUser(Users node){
+		Object[] array= currentlyViewedUser.getFollowings();
 		for(Object user:array){
 			if(user.equals(node))
 				return true;
@@ -179,14 +169,9 @@ public class IndividualUserWindow extends JFrame {
 		 return false;
 	}
 	
-	/**
-	 * This method check to see if the the parameter node is this user and returns true of if this 
-	 * node and the parameter node are equal.
-	 * @param node the User node that this user is trying to follow
-	 * @return true if this user is the same as the parameter node
-	 */
-	private boolean followingOwn(Users node){
-		return node.getID().equals(user.getID());
+	@Override
+	public boolean followingOwn(Users node){
+		return node.getID().equals(currentlyViewedUser.getID());
 	}
 	
 	/*
@@ -200,24 +185,28 @@ public class IndividualUserWindow extends JFrame {
 			if(e.getSource()==btnFollow){
 				String userId=textUserId.getText().trim();
 				Users node=null;
-				LookForMatchingNode iterateTree=new LookForMatchingNode(userId);
-				VisitableTree tree=new VisitableTree(treeModel);
-				tree.accept(iterateTree);
-				if(iterateTree.isInTree())
-					node=iterateTree.getFoundUser();
-				else infoBox("User not found!","ERROR!");
-				if(errorFollowingUser(node))
+				
+				if(treeDataHandler.getUser(userId)!=null){
+					node=treeDataHandler.getUser(userId);
+				}
+				else {
+					popUpBox.infoBox("User not found!","ERROR!");
 					return;
-				if(node instanceof IndividualUser){
-					user.follow((IndividualUser) node);
-					infoBox("User was found!","Found User");
+				}
+				if(errorFollowingUser(node)){
 					return;
+				}
+				else if(!(node instanceof IndividualUser)){
+					popUpBox.infoBox("Operation not supported. Only follow Individual Users can be followed!","ERROR!");
+				}
+				else{
+					follow((IndividualUser)node);
 				}
 			}
 			//source of action is tweet button
 			if(e.getSource()==btnTweet){
 				String msg=textTweetMessage.getText().trim();
-				user.tweet(msg);
+				tweet(msg);
 			}
 		}
 

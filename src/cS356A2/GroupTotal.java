@@ -1,3 +1,4 @@
+package cS356A2;
 /**
  * This class count the total number of groups within a data structure.
  * @author Oscar Nevarez

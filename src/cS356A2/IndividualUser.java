@@ -1,14 +1,15 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
+package cS356A2;
 
 import javax.swing.DefaultListModel;
-import javax.swing.ListModel;
 /**
  * This class is used to create Individual User objects for use in a default tree model.
+ * Note this inheritance is sound, although Individual Users cannot have children, DefaultMutableTree can also not have children.
+ * Whether they are allowed to have children is determined by the boolean variable allowsChildren
+ * @see  javax.swing.tree.DefaultMutableTreeNode
  * @author Oscar Nevarez
  * @version 1.0
  */
+@SuppressWarnings("serial")
 public class IndividualUser extends Users implements Observer,Subject {
 	
 	/*
@@ -49,10 +50,10 @@ public class IndividualUser extends Users implements Observer,Subject {
 	 * @param list the list model that will be assigned to this object, Must be of Type DefaultListModel
 	 * @see DefaultListModel
 	 */
-	public IndividualUser(String id,DefaultListModel<String>list){
+	public IndividualUser(String id){
 		setID(id);
 		this.allowsChildren=false;
-		this.newsFeedListModel=list;
+		this.newsFeedListModel=new DefaultListModel<String>();
 	}
 	@Override
 	public void setID(String id){

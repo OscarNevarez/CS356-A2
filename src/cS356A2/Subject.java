@@ -1,3 +1,4 @@
+package cS356A2;
 /**
  * This interface outlines the required behaviors of a Subject type
  * @author Oscar Nevarez

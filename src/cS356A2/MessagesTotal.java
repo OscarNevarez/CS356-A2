@@ -1,3 +1,4 @@
+package cS356A2;
 /**
  * This class calculates the amount of messages in the data structure this class is visiting.
  * @author Oscar Nevarez

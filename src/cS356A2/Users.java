@@ -1,13 +1,12 @@
+package cS356A2;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
 
 /**
  * This abstract class determines default behaviors for classes the extend this one.
  * @author Oscar Nevarez
  * @version 1.0
  */
+@SuppressWarnings("serial")
 public abstract class Users extends DefaultMutableTreeNode {
 	
 	/**
@@ -21,6 +20,10 @@ public abstract class Users extends DefaultMutableTreeNode {
 	 * @return the id of this class instance represented as a string
 	 */
 	public abstract String getID();
-
+	
+	/**
+	 * This method returns the string representation of an object
+	 * @return the string representation of an object.
+	 */
 	public abstract String toString();
 }

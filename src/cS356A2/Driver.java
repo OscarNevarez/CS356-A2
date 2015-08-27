@@ -1,4 +1,4 @@
-import javax.swing.JFrame;
+package cS356A2;
 
 /**
  * This class serves as the entrance to the application 
@@ -7,6 +7,6 @@ import javax.swing.JFrame;
  */
 public class Driver {
 	public static void main(String[] args) {
-		JFrame admin=AdminWindow.getInstance();
+		AdminWindow.getInstance();
 	}
 }

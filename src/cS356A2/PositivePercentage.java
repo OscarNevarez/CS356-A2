@@ -1,3 +1,4 @@
+package cS356A2;
 import java.util.Arrays;
 
 /**
@@ -26,7 +27,8 @@ public class PositivePercentage implements Visitor {
 	 * @param positiveWords a string containing positive words
 	 */
 	public PositivePercentage(String positiveWords){
-		this.positiveWords=positiveWords.split(" ");// split remove empty spaces.
+		
+		this.positiveWords=positiveWords.toLowerCase().split(" ");// split remove empty spaces.
 	}
 	
 	/**
@@ -34,7 +36,12 @@ public class PositivePercentage implements Visitor {
 	 * @param positiveWords a string array of positive words.
 	 */
 	public PositivePercentage(String[] positiveWords){
+		//make all words lower case
+		for(String positiveWord: positiveWords){
+			positiveWord=positiveWord.toLowerCase();
+		}
 		this.positiveWords=positiveWords;
+		
 	}
 	@Override
 	public void visit(Users node) {
@@ -44,7 +51,7 @@ public class PositivePercentage implements Visitor {
 			messageCount+=messages.length;
 			for(String currentKeyWord: positiveWords)
 				for(String currentMessage:messages)
-					if(currentMessage.contains(currentKeyWord))
+					if(currentMessage.toLowerCase().contains(currentKeyWord))
 						positiveMessages++;
 		}
 	}

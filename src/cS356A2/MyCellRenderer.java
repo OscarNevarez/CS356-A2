@@ -1,4 +1,6 @@
+package cS356A2;
 import java.awt.Component;
+
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -8,6 +10,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * @author Oscar Nevarez
  * @version 1.0
  */
+@SuppressWarnings("serial")
 public class MyCellRenderer extends DefaultTreeCellRenderer {
 	/*
 	 * icon for leaf nodes

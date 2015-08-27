@@ -1,3 +1,4 @@
+package cS356A2;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.*;
@@ -9,19 +10,16 @@ import javax.swing.border.TitledBorder;
 
 import java.awt.Color;
 import java.awt.Component;
-
-import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EtchedBorder;
+import java.util.HashMap;
 
 /**
- * This class creates a JFrame or admin panel
+ * This class creates a JFrame or admin panel, this class does not handle data, that task is delegated to the 
+ * TreeDataHandler class.
  * @author Oscar Nevarez
  * @version 1.0
  */
 @SuppressWarnings("serial")
-public class AdminWindow extends JFrame{
+public class AdminWindow extends JFrame implements AdminPanel{
 	private static AdminWindow instance;
 	private JPanel contentPane;
 	private JButton btnAddUser;
@@ -34,8 +32,8 @@ public class AdminWindow extends JFrame{
 	private JTextArea txtrUserId;
 	private JTextArea txtrUserGroupId;
 	private JTree tree;
-	private DefaultTreeModel treeModel;
-	Users temp=new UserGroup("Root");
+	private TreeDataHandler treeDataHandler;
+	private PopUpDialogBox popUp=new PopUpDialogBox();
 	private JPanel panel1;
 	private JPanel panel2;
 	private JPanel panel3;
@@ -52,51 +50,57 @@ public class AdminWindow extends JFrame{
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
+
+		/*
+		 *create data handler provides access to tree data
+		 */
+		treeDataHandler=new TreeDataHandler(new HashMap<String,Users>());
+
 		/*
 		 * create JTree
 		 */
-		Users rootNode= new UserGroup("Root");
-		treeModel=new DefaultTreeModel(rootNode);
-		
 		panel1 = new JPanel();
 		panel1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Tree View", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel1.setBounds(0, 11, 251, 670);
 		contentPane.add(panel1);
 		panel1.setLayout(null);
-		tree=new JTree(treeModel);
+		tree=new JTree(treeDataHandler.getModel());
 		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.setBounds(0, 0, 235, 681);
 		JScrollPane scrollPane = new JScrollPane(tree);
 		scrollPane.setBounds(10, 21, 231, 638);
 		panel1.add(scrollPane);
-		
-		
+
+
 		/*
 		 * set Icons and create cell renderer.
 		 */
 		Icon leafIcon = UIManager.getIcon("FileView.fileIcon");
 		Icon nonLeafIcon=UIManager.getIcon("FileView.directoryIcon");
 		tree.setCellRenderer(new MyCellRenderer(leafIcon,nonLeafIcon));
-		
-		
+
+
 		//handler for events, privately enclosed class
 		Handler handler=new Handler();
 
+		/*
+		 * buttons
+		 */
 		btnAddUser = new JButton("Add User");
 		btnAddUser.addActionListener(handler);
 		btnAddUser.setBounds(543, 135, 170, 71);
 		contentPane.add(btnAddUser);
-
+		
 		btnAddGroup=new JButton("Add Group");
 		btnAddGroup.addActionListener(handler);
 		btnAddGroup.setBounds(543, 34, 170, 71);
 		contentPane.add(btnAddGroup);
-
+		
 		btnOpenUserView=new JButton("Open User View");
 		btnOpenUserView.addActionListener(handler);
 		btnOpenUserView.setBounds(297, 245, 384, 71);
 		contentPane.add(btnOpenUserView);
-
+		
 		btnShowUserTotal=new JButton("Show User Total");
 		btnShowUserTotal.addActionListener(handler);
 		btnShowUserTotal.setBounds(297, 460, 170, 71);
@@ -117,6 +121,9 @@ public class AdminWindow extends JFrame{
 		btnShowPositivePercentage.setBounds(543, 460, 170, 71);
 		contentPane.add(btnShowPositivePercentage);
 		
+		/*
+		 * text boxes
+		 */
 		panel2 = new JPanel();
 		panel2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "User ID", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel2.setBounds(261, 130, 223, 73);
@@ -126,7 +133,7 @@ public class AdminWindow extends JFrame{
 		txtrUserId = new JTextArea();
 		txtrUserId.setBounds(6, 16, 211, 50);
 		panel2.add(txtrUserId);
-		
+
 		panel3 = new JPanel();
 		panel3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Group ID", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel3.setBounds(261, 30, 223, 73);
@@ -136,149 +143,116 @@ public class AdminWindow extends JFrame{
 		txtrUserGroupId = new JTextArea();
 		txtrUserGroupId.setBounds(6, 16, 211, 50);
 		panel3.add(txtrUserGroupId);
-		
+
 		this.setVisible(true);
 	}
-	
+
 	/**
-	 *Sets the icons for node types, if node is an instance of IndividualUser it is a leaf
-	 *@see MyCellRenderer
+	 * This method returns an instance of this class.
+	 * It enacts the singleton pattern.
+	 * @return an instance of this class
 	 */
-	private void setIcons() {
-		tree.setCellRenderer(new DefaultTreeCellRenderer() {
-         private Icon groupIcon = UIManager.getIcon("FileView.directoryIcon");
-         private Icon userIcon = UIManager.getIcon("FileView.fileIcon");
-         
-         @Override
-         public Component getTreeCellRendererComponent(JTree tree,
-                 Object value, boolean selected, boolean expanded,
-                 boolean isLeaf, int row, boolean focused) {
-             Component c = super.getTreeCellRendererComponent(tree, value,
-                     selected, expanded, isLeaf, row, focused);
-             if (isLeaf)
-                 setIcon(userIcon);
-             else
-                 setIcon(groupIcon);
-             return c;
-         }
-		});
-	}
 	public static AdminWindow getInstance(){
 		if (instance==null)
 			instance=new AdminWindow();
 		return instance;
 	}
-
-   /**
-    * this method adds a new node into the tree, invokes the tree model's inserNodeInto internally
-    * to trigger the appropriate event for the JTree
-    * @param child the node that will be added to the tree model
-    */
-	public void addNode(Users child) {
-		if(treeContains(child)){
-			infoBox("Node already exists in tree!","error");
+	@Override
+	public void openUserView(Users user) {
+		Users node=getSelectedNode(this.tree);
+		if(!(node instanceof IndividualUser)){
+			popUp.infoBox("Operation not supported! No user view for groups!","ERROR!");
 			return;
 		}
-		
+		else {
+			new IndividualUserWindow((IndividualUser)node,treeDataHandler);
+		}
+	}
+	@Override
+	public Users getSelectedNode(JTree tree){
 		TreePath parentPath = tree.getSelectionPath(); 
-		Users parentNode=null;
+		Users selectedNode=null;
 		if (parentPath == null) {
-			parentNode = (Users) treeModel.getRoot();
+			selectedNode = (Users) treeDataHandler.getModel().getRoot();
 		} else {
-			parentNode = (Users)(parentPath.getLastPathComponent());
+			selectedNode = (Users)(parentPath.getLastPathComponent());
 		}
-		if(!parentNode.getAllowsChildren()){
-			infoBox("Operation not supported!Leaf nodes cannot have children.","ERROR!");
-			return;
-		}
-		treeModel.insertNodeInto(child,parentNode,parentNode.getChildCount());
-		tree.scrollPathToVisible(new TreePath(child.getPath()));
+		return selectedNode;	
 	}
-	
-	/**
-	 * This method checks to see if a the parameter node is already in the tree
-	 * @param child the node that is being searched for in the tree
-	 * @return true if the parameter node is already in the tree.
-	 */
-	private boolean treeContains(Users child) {
-		LookForMatchingNode iterateTree=new LookForMatchingNode(child.getID());
-		VisitableTree tree=new VisitableTree(treeModel);
-		tree.accept(iterateTree);
-		return iterateTree.isInTree();
-	}
-	
-	/**
-	 *This method opens a user view 
-	 */
-	private void openUserView(){
+	@Override
+	public void setIcons() {
+		tree.setCellRenderer(new DefaultTreeCellRenderer() {
+			private Icon groupIcon = UIManager.getIcon("FileView.directoryIcon");
+			private Icon userIcon = UIManager.getIcon("FileView.fileIcon");
 
-		TreePath parentPath = tree.getSelectionPath(); 
-		Users testNode=(Users)(parentPath.getLastPathComponent());
-		if(testNode instanceof IndividualUser){
-			JFrame userView=new IndividualUserWindow((IndividualUser) testNode,treeModel);
-			userView.setVisible(true);
-		}
-		else 
-			infoBox("Action not supported, no User View for Groups","ERROR!");
-	}
-	
-	/**
-	 * This method creates a pop up box with a message
-	 * @param infoMessage the message that appears in the pop up box
-	 * @param titleBar the title bar for the window
-	 */
-	private void infoBox(String infoMessage, String titleBar)
-	{
-		JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
+			@Override
+			public Component getTreeCellRendererComponent(JTree tree,
+					Object value, boolean selected, boolean expanded,
+					boolean isLeaf, int row, boolean focused) {
+				Component c = super.getTreeCellRendererComponent(tree, value,
+						selected, expanded, isLeaf, row, focused);
+				if (isLeaf)
+					setIcon(userIcon);
+				else
+					setIcon(groupIcon);
+				return c;
+			}
+		});
 	}
 	private class Handler implements ActionListener {
 		//action from respective buttons
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
+			//grab the currently selected node in the j tree.
+			Users selectedNode=getSelectedNode(tree);
+
+
 			if(e.getSource()==btnAddUser){
 				String userId=txtrUserId.getText().trim();
+				Users newUser=new IndividualUser(userId);
+				selectedNode=getSelectedNode(tree);
 				if(userId.isEmpty())
 					return;
-				addNode(new IndividualUser(userId,new DefaultListModel<String>()));
+				treeDataHandler.addNode(selectedNode,newUser,tree);
 			}
 			if(e.getSource()==btnAddGroup){
 				String groupId=txtrUserGroupId.getText().trim();
+				Users newUserGroup=new UserGroup(groupId);
 				if(groupId.isEmpty())
 					return;
-				addNode(new UserGroup(groupId));
+				treeDataHandler.addNode(selectedNode,newUserGroup,tree);
 			}
 			if(e.getSource()==btnOpenUserView){
-				openUserView();
+				openUserView(selectedNode);
 			}
 			else{
-				VisitableTree tree=new VisitableTree(treeModel);
-				
+
 				if(e.getSource()==btnShowUserTotal){
 					UserTotal userTotal=new UserTotal();
-					tree.accept(userTotal);
-					infoBox("There are "+userTotal.result()+" users.","Total Users");
+					treeDataHandler.accept(userTotal);
+					popUp.infoBox("There are "+userTotal.result()+" users.","Total Users");
 				}
 				if(e.getSource()==btnShowGroupTotal){
 					GroupTotal groupTotal=new GroupTotal();
-					tree.accept(groupTotal);
-					infoBox("There are "+groupTotal.result()+" groups.","Total Groups");
+					treeDataHandler.accept(groupTotal);
+					popUp.infoBox("There are "+groupTotal.result()+" groups.","Total Groups");
 
 				}
 				if(e.getSource()==btnShowMessagesTotal){
 					MessagesTotal messagesTotal= new MessagesTotal();
-					tree.accept(messagesTotal);
-					infoBox("There are "+messagesTotal.result()+" Messages.","Total Messages");
+					treeDataHandler.accept(messagesTotal);
+					popUp.infoBox("There are "+messagesTotal.result()+" Messages.","Total Messages");
 				}
 				if(e.getSource()==btnShowPositivePercentage){
 					PositivePercentage positivePercentage=new PositivePercentage("good happy awesome great excellent agree honest admirable amazing astonishing beatiful caring"
 							+ "brilliant charismatic dandy faithful giving");
-					tree.accept(positivePercentage);
-					infoBox(+positivePercentage.result()+"% of messages are positive","Positive Percentage of messages");
+					treeDataHandler.accept(positivePercentage);
+					popUp.infoBox(String.format("%.4g",positivePercentage.result())+"% of messages are positive","Positive Percentage of messages");
 				}
 			}
 		}
 
 
 	}
-
 }

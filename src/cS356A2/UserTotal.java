@@ -1,3 +1,4 @@
+package cS356A2;
 /**
  * This class calculates the total amount of individual users in a data structure. 
  * @author Oscar Nevarez

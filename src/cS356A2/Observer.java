@@ -1,3 +1,4 @@
+package cS356A2;
 /**
  * This interface defines the basic behavior of an Observer type.
  * @author Oscar Nevarez

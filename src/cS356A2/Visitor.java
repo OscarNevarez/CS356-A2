@@ -1,3 +1,4 @@
+package cS356A2;
 /**
  * This interface defines the default behaviors of a Visitor type
  * @author Oscar Nevarez
